@@ -31,3 +31,7 @@ acme_email: flaring-hazy-thaw@duck.com
 acme_issuer: letsencrypt-prod
 certmanager_chart_version: "v1.19.1"
 
+fleet_repo: fleet
+cluster_name: vps1
+github_bootstrap_token: "{{ vault_github_bootstrap_token }}"
+sops_age_key: "{{ vault_sops_age_key }}"

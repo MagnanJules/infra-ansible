@@ -15,6 +15,7 @@
     - k3s
     - helm
     - cilium
+    - flux
     - certmanager
     - observability
 
