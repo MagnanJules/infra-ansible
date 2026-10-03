@@ -1,0 +1,18 @@
+- name: Check installed Helm version
+  ansible.builtin.command: helm version --short
+  changed_when: false
+  failed_when: false
+  register: helm_installed
+
+- name: Download Helm installer
+  ansible.builtin.get_url:
+    url: https://raw.githubusercontent.com/helm/helm/v{{ helm_version }}/scripts/get-helm-3
+    dest: /usr/local/bin/helm-install.sh
+    mode: "0755"
+  when: not helm_installed.stdout.startswith('v' ~ helm_version)
+
+- name: Install Helm {{ helm_version }}
+  ansible.builtin.command: /usr/local/bin/helm-install.sh
+  environment:
+    DESIRED_VERSION: "v{{ helm_version }}"
+  when: not helm_installed.stdout.startswith('v' ~ helm_version)

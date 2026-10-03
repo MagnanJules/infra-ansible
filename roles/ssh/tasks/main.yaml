@@ -1,0 +1,20 @@
+- name: Authorize admin key
+  ansible.posix.authorized_key:
+    user: "{{ admin_user }}"
+    key: "{{ admin_ssh_pubkey }}"
+    exclusive: true
+
+- name: Harden sshd
+  ansible.builtin.copy:
+    dest: /etc/ssh/sshd_config.d/99-hardening.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      AuthenticationMethods publickey
+      X11Forwarding no
+      MaxAuthTries 3
+    mode: "0644"
+  notify:
+    - validate ssh config
+    - restart ssh

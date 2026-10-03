@@ -1,0 +1,26 @@
+- name: Base config
+  hosts: k3s_server
+  become: true
+  tags: [base]
+  roles:
+    - common
+    - ssh
+    - firewall
+
+- name: Kube (k3s + Cilium)
+  hosts: k3s_server
+  become: true
+  tags: [kube]
+  roles:
+    - k3s
+    - helm
+    - cilium
+    - certmanager
+    - observability
+
+- name: Tenant bootstrap
+  hosts: k3s_server
+  become: true
+  tags: [app]
+  roles:
+    - tenant

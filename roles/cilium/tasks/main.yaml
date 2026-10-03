@@ -1,0 +1,26 @@
+- name: Install or update Cilium
+  kubernetes.core.helm:
+    name: cilium
+    chart_ref: cilium
+    chart_repo_url: https://helm.cilium.io/
+    chart_version: "{{ cilium_version }}"
+    release_namespace: kube-system
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    values: "{{ lookup('ansible.builtin.template', 'values.yaml.j2') | from_yaml }}"
+    wait: true
+  register: cilium_release
+
+- name: Wait for the node to be ready
+  ansible.builtin.command: k3s kubectl wait --for=condition=Ready node --all --timeout=300s
+  changed_when: false
+
+- name: Get kubeconfig
+  ansible.builtin.fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: "{{ lookup('env', 'HOME') }}/.kube/kube-lab.yaml"
+    flat: true
+
+- name: Restart Cilium
+  ansible.builtin.command: >-
+    k3s kubectl -n kube-system rollout restart deployment/cilium-operator daemonset/cilium
+  when: cilium_release is changed

@@ -1,0 +1,50 @@
+- name: Create deployer
+  ansible.builtin.user:
+    name: deploy
+    shell: /usr/sbin/nologin
+    create_home: true
+
+- name: Auth CI key
+  ansible.posix.authorized_key:
+    user: deploy
+    key: "{{ lookup('file', deploy_ssh_pubkey_path) }}"
+    key_options: 'restrict,port-forwarding,permitopen="127.0.0.1:6443"'
+    exclusive: true
+
+- name: Create namespace and deployer RBAC
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'tenant.yaml.j2') | from_yaml_all | list }}"
+
+- name: Create application secrets
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'secrets.yaml.j2') | from_yaml_all | list }}"
+  no_log: true
+
+- name: Read deployer token
+  kubernetes.core.k8s_info:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    kind: Secret
+    namespace: "{{ app_namespace }}"
+    name: deploy-token
+  register: secret_token
+  until: >-
+    secret_token.resources | default([]) | length > 0
+    and 'token' in (secret_token.resources[0].data | default({}))
+  retries: 10
+  delay: 3
+  no_log: true
+
+- name: Generate kubeconfig of CI
+  ansible.builtin.template:
+    src: deploy-kubeconfig.yaml.j2
+    dest: "{{ lookup('env', 'HOME') }}/.config/kube-lab/deploy-kubeconfig.yaml"
+    mode: "0600"
+  vars:
+    sa_data: "{{ secret_token.resources[0].data }}"
+  delegate_to: localhost
+  become: false
+  no_log: true
