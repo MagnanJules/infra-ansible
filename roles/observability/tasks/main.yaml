@@ -63,13 +63,3 @@
     state: present
     definition: "{{ lookup('ansible.builtin.template', 'grafana-ingress.yaml.j2') | from_yaml }}"
 
-- name: Install node-exporter
-  kubernetes.core.helm:
-    name: node-exporter
-    chart_ref: prometheus-node-exporter
-    chart_repo_url: https://prometheus-community.github.io/helm-charts
-    chart_version: "{{ node_exporter_chart_version }}"
-    release_namespace: "{{ monitoring_namespace }}"
-    kubeconfig: /etc/rancher/k3s/k3s.yaml
-    values: "{{ lookup('ansible.builtin.template', 'node-exporter-values.yaml.j2') | from_yaml }}"
-    wait: true
