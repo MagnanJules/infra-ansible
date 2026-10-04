@@ -29,7 +29,6 @@ public_host: "{{ ansible_default_ipv4.address }}"
 public_domain: julesmagnan.com
 acme_email: flaring-hazy-thaw@duck.com
 acme_issuer: letsencrypt-prod
-certmanager_chart_version: "v1.19.1"
 
 fleet_repo: fleet
 cluster_name: vps1

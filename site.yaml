@@ -16,7 +16,6 @@
     - helm
     - cilium
     - flux
-    - certmanager
     - observability
 
 - name: Tenant bootstrap
