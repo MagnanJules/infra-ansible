@@ -4,6 +4,7 @@
   tags: [base]
   roles:
     - common
+    - atop
     - ssh
     - firewall
 
@@ -16,7 +17,6 @@
     - helm
     - cilium
     - flux
-    - observability
 
 - name: Tenant bootstrap
   hosts: k3s_server
