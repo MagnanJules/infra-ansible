@@ -1,0 +1,18 @@
+- name: Install atop
+  ansible.builtin.apt:
+    name: atop
+    state: present
+
+- name: Save state every 30s
+  ansible.builtin.lineinfile:
+    path: /etc/default/atop
+    regexp: "^LOGINTERVAL="
+    line: "LOGINTERVAL=30"
+  notify: restart atop
+
+- name: Keep history
+  ansible.builtin.lineinfile:
+    path: /etc/default/atop
+    regexp: "^LOGGENERATIONS="
+    line: "LOGGENERATIONS=3"
+  notify: restart atop
