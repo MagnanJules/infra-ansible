@@ -34,3 +34,8 @@ fleet_repo: fleet
 cluster_name: vps1
 github_bootstrap_token: "{{ vault_github_bootstrap_token }}"
 sops_age_key: "{{ vault_sops_age_key }}"
+
+rate_limited_ports: "80,443"
+rate_limit_new_connections: 60/minute
+rate_limit_burst: 100
+rate_limit_concurrent: 50

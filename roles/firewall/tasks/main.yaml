@@ -3,6 +3,19 @@
     name: ufw
     state: present
 
+- name: Limit connexion by IPs
+  ansible.builtin.blockinfile:
+    path: "{{ item.path }}"
+    marker: "# {mark} ANSIBLE rate limit"
+    insertbefore: "^COMMIT"
+    block: |
+      -A {{ item.chain }} -p tcp -m multiport --dports {{ rate_limited_ports }} -m conntrack --ctstate NEW -m hashlimit --hashlimit-name {{ item.name }} --hashlimit-mode srcip --hashlimit-srcmask {{ item.mask }} --hashlimit-above {{ rate_limit_new_connections }} --hashlimit-burst {{ rate_limit_burst }} -j DROP
+      -A {{ item.chain }} -p tcp --syn -m multiport --dports {{ rate_limited_ports }} -m connlimit --connlimit-above {{ rate_limit_concurrent }} --connlimit-mask {{ item.mask }} -j REJECT --reject-with tcp-reset
+  loop:
+    - { path: /etc/ufw/before.rules, chain: ufw-before-input, name: ratelimit4, mask: 32 }
+    - { path: /etc/ufw/before6.rules, chain: ufw6-before-input, name: ratelimit6, mask: 64 }
+  notify: reload ufw
+
 - name: Allowing SSH
   community.general.ufw:
     rule: allow
@@ -41,3 +54,5 @@
     rule: allow
     port: "443"
     proto: tcp
+
+
