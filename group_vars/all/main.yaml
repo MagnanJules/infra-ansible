@@ -1,7 +1,7 @@
 admin_user: ubuntu
 admin_ssh_pubkey: "{{ lookup('file', '~/.ssh/vps1_ovh.pub') }}"
 swap_size_mb: 2048
-swappiness: 10
+swappiness: 40
 
 k3s_version: v1.35.8+k3s1
 cilium_version: 1.20.0
@@ -10,16 +10,6 @@ k8s_pod_cidr: 10.42.0.0/16
 k8s_service_cidr: 10.43.0.0/16
 k8s_api_host: "{{ ansible_facts['default_ipv4']['address'] }}"
 
-grafana_admin_password: "{{ vault_grafana_admin_password }}"
-
-vm_chart_version: "0.48.0"
-grafana_chart_version: "13.2.7"
-jaeger_chart_version: "4.14.1"
-node_exporter_chart_version: "4.59.0"
-node_exporter_dashboard_revision: 45
-monitoring_namespace: monitoring
-
-app_namespace: kuby
 github_user: MagnanJules
 deploy_ssh_pubkey_path: ~/.config/kube-lab/deploy_key.pub
 gateway_api_key: "{{ vault_gateway_api_key }}"
@@ -27,8 +17,6 @@ ghcr_pull_token: "{{ vault_ghcr_pull_token | default('') }}"
 
 public_host: "{{ ansible_default_ipv4.address }}"
 public_domain: julesmagnan.com
-acme_email: flaring-hazy-thaw@duck.com
-acme_issuer: letsencrypt-prod
 
 fleet_repo: fleet
 cluster_name: vps1

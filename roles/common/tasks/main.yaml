@@ -57,6 +57,26 @@
     value: "{{ swappiness }}"
     state: present
 
+- name: Journald config directory
+  ansible.builtin.file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    mode: "0755"
+
+- name: Persistent journal
+  ansible.builtin.copy:
+    dest: /etc/systemd/journald.conf.d/99-persistent.conf
+    content: |
+      [Journal]
+      Storage=persistent
+      SystemMaxUse=400M
+      SystemMaxFileSize=50M
+      MaxRetentionSec=2week
+      RateLimitIntervalSec=30s
+      RateLimitBurst=5000
+    mode: "0644"
+  notify: restart journald
+
 - name: Check reboot
   ansible.builtin.stat:
     path: /var/run/reboot-required
