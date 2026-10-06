@@ -10,6 +10,7 @@ k8s_pod_cidr: 10.42.0.0/16
 k8s_service_cidr: 10.43.0.0/16
 k8s_api_host: "{{ ansible_facts['default_ipv4']['address'] }}"
 
+app_namespace: kuby
 github_user: MagnanJules
 deploy_ssh_pubkey_path: ~/.config/kube-lab/deploy_key.pub
 gateway_api_key: "{{ vault_gateway_api_key }}"
