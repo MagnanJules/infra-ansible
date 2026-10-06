@@ -11,6 +11,18 @@ prometheus:
   enabled: true
 dashboards:
   enabled: true
+  label: grafana_dashboard
+  labelValue: "1"
+  annotations:
+    grafana_folder: "Cilium"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 384Mi
+  limits:
+    cpu: 100m
+    memory: 384Mi
 
 operator:
   replicas: 1
@@ -18,20 +30,42 @@ operator:
     enabled: true
   dashboards:
     enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+    annotations:
+      grafana_folder: "Cilium"
+  resources:
+    requests:
+      cpu: 25m
+      memory: 96Mi
+    limits:
+      memory: 256Mi
 
 # hubble: obs network of cilium
 hubble:
+  enabled: true
   relay:
     enabled: true
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        memory: 192Mi
   ui:
+    enabled: false
+  dashboards:
     enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+    annotations:
+      grafana_folder: "Cilium"
   metrics:
     enabled:
-      - drop # rejected packet
-      - tcp # flag TCP
-      - flow
-      - port-distribution
-      - icmp
+      - "drop:sourceContext=workload-name;destinationContext=workload-name" # rejected packet
+      - "tcp" # flag TCP
+      - "flow:sourceContext=workload-name;destinationContext=workload-name"
+      - "icmp"
 
 ingressController:
   enabled: true
@@ -45,6 +79,9 @@ ingressController:
     httpsPort: 443
 
 envoy:
+  prometheus:
+    enabled: true
+    port: "9964"
   securityContext:
     capabilities:
       keepCapNetBindService: true
@@ -52,3 +89,10 @@ envoy:
         - NET_ADMIN
         - SYS_ADMIN
         - NET_BIND_SERVICE
+  resources:
+    requests:
+      cpu: 100m
+      memory: 192Mi
+    limits:
+      cpu: 100m
+      memory: 192Mi
